@@ -6,9 +6,9 @@
 #'
 #' @name plotStoichiometry
 #'
-#' @param values Named numeric vector specifying the values of all state
-#'   variables and parameters. For non-autonomous models, there must also be
-#'   an element named 'time'.
+#' @param box A vector of positive integers pointing to a spatial sub-unit of
+#'   the model.
+#' @param time Time. The value is ignored in the case of autonomous models.
 #' @param cex Character expansion factor.
 #' @param colPositive Color for positive stoichiometric factors.
 #' @param colNegative Color for negative stoichiometric factors.
@@ -16,10 +16,11 @@
 #'
 #' @return NULL
 #'
-#' @note If the stoichiometric factors are mathematical expressions involving
+#' @note The values of state variables and parameters must have been set using
+#'   the \code{\link{setVars}} and \code{\link{setPars}} methods. If the
+#'   stoichiometric factors are mathematical expressions involving
 #'   function references, these functions must be defined in R (even if the
 #'   numerical computations are based on generated Fortran code).
-#'   
 #'
 #' @author \email{david.kneis@@tu-dresden.de}
 #'
@@ -29,26 +30,20 @@
 #'   in the package vignette.
 #'
 #' @examples
-#' data(exampleIdentifiers, exampleProcesses, exampleStoichiometry)
-#' model= new("rodeo",
-#'   vars=subset(exampleIdentifiers, type=="v"),
-#'   pars=subset(exampleIdentifiers, type=="p"),
-#'   funs=subset(exampleIdentifiers, type=="f"),
-#'   pros=exampleProcesses, stoi=exampleStoichiometry
-#' )
-#' c_z_in= function(time) {0.1}
-#' c_do_in= function(time) {8.0}
-#' model$plotStoichiometry(c(s_do_z=2.76, c_z=1, c_do=9.022, time=0))
+#' data(vars, pars, funs, pros, stoi)
+#' model <- rodeo$new(vars, pars, funs, pros, stoi, dim=c(1))
+#' model$setVars(c(bac=0.1, sub=0.5))
+#' model$setPars(c(mu=0.8, half=0.1, yield= 0.1, vol=1000, flow=50, sub_in=1))
+#' monod <- function(c,h) {c/(c+h)}
+#' model$plotStoichiometry(box=c(1))
 
-rodeo$methods( plotStoichiometry = function(values, cex=1,
-  colPositive="darkorange", colNegative="steelblue4", colGrid="grey") {
-  "Plots qualitative stoichiometry information. See
-  \\code{\\link{plotStoichiometry}} for details."
-
-  m= .self$stoichiometry(values=values)
-  dx=0.2
-  dy=sqrt((dx**2)/2)
-  mar= 0.5
+rodeo$set("public", "plotStoichiometry", function(box, time=0, cex=1,
+  colPositive="darkorange", colNegative="steelblue4", colGrid="grey"
+) {
+  m <- self$stoichiometry(box=box, time=time)
+  dx <- 0.2
+  dy <- sqrt((dx**2)/2)
+  mar <- 0.5
   plot(0, 0, xlim=c(1-mar,(ncol(m)+mar)), ylim=c(1-mar,(nrow(m)+mar)), type="n",
     bty="n", xaxt="n", yaxt="n", xlab="", ylab="")
   mtext(side=3, at=1:ncol(m), colnames(m), line=0.5, las=2, cex=cex)

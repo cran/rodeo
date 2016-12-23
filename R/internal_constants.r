@@ -1,5 +1,5 @@
 
-rodeoConst= list(
+rodeoConst <- list(
 
   # Regular expressions to detect valid identifiers
   identifierPatterns= list(
@@ -12,18 +12,18 @@ rodeoConst= list(
   genIdent= list(
     # vectors with actual values of vars, pars, rates, derivatives
     vec=     c(vars="var",    pars="par",    pros="pro", drvs="dydt"),
-    # index vectors for the 0D case (or 1st level, respectively)
+    # index vectors for the 0D case (or 1st box, respectively)
     ivec0D=  c(vars="ivar0D", pars="ipar0D", pros="ipro0D"),
-    # index vectors for the current level
+    # index vectors for the current box
     ivec=    c(vars="ivar",   pars="ipar",   pros="ipro"),
-    # (pointers to) indices of variables in first level
+    # (pointers to) indices of variables in first box
     ilist0D= c(vars="v0D",    pars="p0D",    pros="r0D"),
-    # (pointers to) indices of variables in current level
+    # (pointers to) indices of variables in current box
     ilist=   c(vars="v",      pars="p",      pros="r"),
     # dimensions
-    len=     c(vars="NVAR",   pars="NPAR",   pros="NPRO"),
-    # number of levels and index of current level
-    nLevels="NLVL", iLevel= "level"
+    len=     c(vars="NVAR",   pars="NPAR",   pros="NPRO",   boxes="NBOX"),
+    # index of current box
+    iBox= "iBox"
   ),
 
   reservedNames= c(
