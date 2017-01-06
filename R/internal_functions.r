@@ -21,15 +21,15 @@ checkTbl <- function(tbl, tblName, colNames, nameCol, emptyOK) {
     # Check entries in name column
     if (!is.null(nameCol)) {
       if (!(nameCol %in% names(tbl)))
-        stop(paste0("column '",nameCol," not present in '",tblName,"'"))
+        stop(paste0("column '",nameCol,"' not present in '",tblName,"'"))
       if (any(is.na(tbl[,nameCol])))
-        stop(paste0("NA values not allowed in column '",nameCol," of '",
+        stop(paste0("NA values not allowed in column '",nameCol,"' of '",
           tblName,"'"))
       if (any(duplicated(tbl[,nameCol])))
-        stop(paste0("duplicate names detected in column '",nameCol," of '",
+        stop(paste0("duplicate names detected in column '",nameCol,"' of '",
           tblName,"'"))
       if (any(tbl[,nameCol] %in% rodeoConst$reservedNames))
-        stop(paste0("column '",nameCol," of '",tblName,"' must not",
+        stop(paste0("column '",nameCol,"' of '",tblName,"' must not",
           " contain any of the reserved words '",
           paste(rodeoConst$reservedNames, collapse="', '"),"'"))
     }
@@ -79,6 +79,8 @@ undeclared <- function(expr, knownNames) {
 
 # Substitute identifiers in a mathematical expression (given as a string)
 substituteIdentifiers <- function(expr, sub, all=TRUE) {
+  if ((length(expr) != 1) || (!is.character(expr)))
+    stop("expression is not a scalar character string")
   # Check vector of substitutes
   if (is.null(names(sub)) || any(names(sub) == ""))
     stop("missing element name(s) in vector of substitutes")

@@ -12,6 +12,7 @@ The base name of the shared library file created with
 }
 \description{
 Return the pure name of the shared library for use with
+ \code{\link[deSolve]{deSolve}} or \code{\link[rootSolve]{rootSolve}} methods.
 }
 \author{
 \email{david.kneis@tu-dresden.de}

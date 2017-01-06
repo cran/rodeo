@@ -11,6 +11,7 @@ The name of the function to compute derivatives which is contained in
 }
 \description{
 Return the name of the library function for use with
+ \code{\link[deSolve]{deSolve}} or \code{\link[rootSolve]{rootSolve}} methods.
 }
 \author{
 \email{david.kneis@tu-dresden.de}
