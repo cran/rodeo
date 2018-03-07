@@ -31,11 +31,13 @@ rodeo$set("public", "initStepper",
 
   # Required files to build the library
   srcFiles <- c(
-    integrators= system.file('fortran/integrators.f95',package='rodeo'),
+    integrators= paste0(tempfile(),".f95"),
     funcs= normalizePath(sources),
     derivs= paste0(tempfile(),".f95"),
     wrapper= paste0(tempfile(),".f95")
   )
+  file.copy(from=system.file('fortran/integrators.f95',package='rodeo'),
+    to=srcFiles["integrators"], overwrite=TRUE)
   
   # Register basic stepper info
   fl <- gsub("\\", "/", tempfile(pattern=method), fixed=TRUE)
@@ -147,9 +149,10 @@ rodeo$set("public", "initStepper",
   # Create library
   wd <- getwd()
   setwd(tempdir())
-  command <- paste0("R CMD SHLIB ",paste(srcFiles, collapse=" "),
+  command <- "R"
+  args <- paste0("CMD SHLIB ",paste(srcFiles, collapse=" "),
     " --preclean --clean -o ",private$steppers[[method]]$libFile)
-  if (system(command) != 0) {
+  if (system2(command, args) != 0) {
     setwd(wd)
     stop("Failed to build shared library.")
   }
