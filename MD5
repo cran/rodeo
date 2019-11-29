@@ -1,11 +1,11 @@
-89b0e2e9da18ad9aea2f284efed20b4d *DESCRIPTION
+d90f43a415939356d37f7060b997e8a9 *DESCRIPTION
 3a3327e67d2cc4dd4c26e493c12b5453 *NAMESPACE
 acce6f297e343b47b9266e29d1b13c5c *R/0_package.r
 53df6e69c5e4fea38703459c72c17077 *R/class.r
 46157670dbb658b3db58bda47bd6a785 *R/classMethod_compile.r
 1a80d9207c8245cb889032ae92bae91a *R/classMethod_dynamics.r
 4966d8c046cbd49a6503a50f89762dd1 *R/classMethod_finalize.r
-11632adf8ed76b73eee042a424abe5ed *R/classMethod_generate.r
+37ac00f6f204f6c2153b5d225999ead6 *R/classMethod_generate.r
 fcf04530f8a99b47ccca4675785d645b *R/classMethod_getDim.r
 ecbce69196b5cd1cccfe4e388d948cbd *R/classMethod_initStepper.r
 9daa173fc5ae6c1d9050b834707947cd *R/classMethod_initialize.r
@@ -19,11 +19,11 @@ faa07668c1919acd9e8ae1b41b9ce815 *R/classMethods_setValues.r
 8f54bdde88eb6ceeafbfbda675d24745 *R/data.r
 175c96183a063d128ba9ccc4046812ed *R/internal_constants.r
 f302889ca494babfe49961f74cb4842a *R/internal_functions.r
-a0f566c8f39da0f8bc9fd71ecd3e032e *R/plainMethod_exportDF.r
+e47ba0fafdee58efda8fa37661e08bf4 *R/plainMethod_exportDF.r
 0677d1076c920b302f37db149842a93f *R/plainMethod_forcingFunctions.r
 3505f21181657bec9a742c94311e068b *R/plainMethods_stoiBuild_stoiCheck.r
 6181e815e026df0ca955ec4fe4205a38 *README.md
-5fe5fc31bf6791b202c2ff917729ee70 *build/vignette.rds
+a12358dbf2dccb6db8e29354a9178daa *build/vignette.rds
 1fe02c029f0d5becee3112ef2ab1d14b *data/funs.r
 c60fd868c3fbc9950b7210e2f51850f5 *data/pars.r
 e8073023e82f459f223b0c85418ab48d *data/pros.r
@@ -99,8 +99,8 @@ ad50c1a670b4a7e874b06c1f3a89dd20 *inst/doc/examples/linked/waterSediment/singleO
 2695be0b3c2cb664c7f2aa683e7c6a68 *inst/doc/examples/linked/waterSediment/xecute_multiObject.r
 08a9d6aab19581022167546b820f1a30 *inst/doc/examples/linked/waterSediment/xecute_singleObject.r
 f68a3d0e3a87e127abd15180cdda8892 *inst/doc/rodeoVignette.R
-438431a4fff3e765c238bad48674d007 *inst/doc/rodeoVignette.Rmd
-d9f50da23e977f9a178ad9c116251c8b *inst/doc/rodeoVignette.pdf
+e74c80544659cc7e541c5b16ffecb76b *inst/doc/rodeoVignette.Rmd
+b222c39dbfa6807e45a5bcf3c94db8e7 *inst/doc/rodeoVignette.pdf
 96cc4f86de0d69d3d0d18963644542b3 *inst/doc/vignetteData/fig/overview.odg
 44f92c56ee10ae7064f38f50d055fed3 *inst/doc/vignetteData/fig/overview.png
 4cf536fa3e01bfbbcc3674a7e55ed051 *inst/doc/vignetteData/fig/reactor.odg
@@ -207,7 +207,7 @@ ad50c1a670b4a7e874b06c1f3a89dd20 *vignettes/examples/linked/waterSediment/single
 08a9d6aab19581022167546b820f1a30 *vignettes/examples/linked/waterSediment/xecute_singleObject.r
 a03d4300426ed1ee85c353a7462c0b9b *vignettes/preamble-latex.tex
 033a9de08856b81f38fccd183c8606d9 *vignettes/references.bib
-438431a4fff3e765c238bad48674d007 *vignettes/rodeoVignette.Rmd
+e74c80544659cc7e541c5b16ffecb76b *vignettes/rodeoVignette.Rmd
 96cc4f86de0d69d3d0d18963644542b3 *vignettes/vignetteData/fig/overview.odg
 44f92c56ee10ae7064f38f50d055fed3 *vignettes/vignetteData/fig/overview.png
 4cf536fa3e01bfbbcc3674a7e55ed051 *vignettes/vignetteData/fig/reactor.odg
