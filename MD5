@@ -1,4 +1,4 @@
-d90f43a415939356d37f7060b997e8a9 *DESCRIPTION
+f6dbed8a06619c6d6f4ebbc54c8dd9df *DESCRIPTION
 3a3327e67d2cc4dd4c26e493c12b5453 *NAMESPACE
 acce6f297e343b47b9266e29d1b13c5c *R/0_package.r
 53df6e69c5e4fea38703459c72c17077 *R/class.r
@@ -22,8 +22,8 @@ f302889ca494babfe49961f74cb4842a *R/internal_functions.r
 e47ba0fafdee58efda8fa37661e08bf4 *R/plainMethod_exportDF.r
 0677d1076c920b302f37db149842a93f *R/plainMethod_forcingFunctions.r
 3505f21181657bec9a742c94311e068b *R/plainMethods_stoiBuild_stoiCheck.r
-6181e815e026df0ca955ec4fe4205a38 *README.md
-a12358dbf2dccb6db8e29354a9178daa *build/vignette.rds
+0a1b4347771616e439f213c0466b1dfa *README.md
+29c722982a65e2fb253d8ead9db04d93 *build/vignette.rds
 1fe02c029f0d5becee3112ef2ab1d14b *data/funs.r
 c60fd868c3fbc9950b7210e2f51850f5 *data/pars.r
 e8073023e82f459f223b0c85418ab48d *data/pros.r
@@ -98,9 +98,9 @@ ad50c1a670b4a7e874b06c1f3a89dd20 *inst/doc/examples/linked/waterSediment/singleO
 1b607292d85c1cd3b39b96ec719cdcad *inst/doc/examples/linked/waterSediment/singleObject/vars.txt
 2695be0b3c2cb664c7f2aa683e7c6a68 *inst/doc/examples/linked/waterSediment/xecute_multiObject.r
 08a9d6aab19581022167546b820f1a30 *inst/doc/examples/linked/waterSediment/xecute_singleObject.r
-f68a3d0e3a87e127abd15180cdda8892 *inst/doc/rodeoVignette.R
-e74c80544659cc7e541c5b16ffecb76b *inst/doc/rodeoVignette.Rmd
-b222c39dbfa6807e45a5bcf3c94db8e7 *inst/doc/rodeoVignette.pdf
+dc5f206f092d2ae8e89203dc46d5f94a *inst/doc/rodeoVignette.R
+e2b66437d3862c3fe65569618ec609a1 *inst/doc/rodeoVignette.Rmd
+b21ae9f7a79069c66d063ccc6dc5f61e *inst/doc/rodeoVignette.pdf
 96cc4f86de0d69d3d0d18963644542b3 *inst/doc/vignetteData/fig/overview.odg
 44f92c56ee10ae7064f38f50d055fed3 *inst/doc/vignetteData/fig/overview.png
 4cf536fa3e01bfbbcc3674a7e55ed051 *inst/doc/vignetteData/fig/reactor.odg
@@ -112,7 +112,7 @@ c5ea2609fa9cb32a9956125748848958 *inst/fortran/forcingsInclude.f95
 3f2241d5d29649a29d4e9c381952d1f9 *inst/fortran/integrators.f95
 ac89af0f4da6e5fd958673a750c5a31d *man/compile.Rd
 4e3e7e4723af8fb2a33cfc3cc1f2f223 *man/dynamics.Rd
-ef70ff1d4404a1db045efbd5531f0b8e *man/exportDF.Rd
+0e4765fbc5486e93fe4e92f3e8ee2b4c *man/exportDF.Rd
 3900d438069efba095c643daeb6c7e29 *man/finalize.Rd
 1c7044fa3c77c59ae31cb0ec6025ddf4 *man/forcingFunctions.Rd
 171430fc887581b6afedd2937d4a4e80 *man/funs.Rd
@@ -126,14 +126,14 @@ d607ce8e350e0ca91e5dacc1c9ba2367 *man/libName.Rd
 7e781d9cdf6b370bd80f7d4065b0470b *man/pars.Rd
 9e25420ca937642a2dfd5fce890bd552 *man/plotStoichiometry.Rd
 48dfecaf974bfc881865a733602e9285 *man/pros.Rd
-24a523ab75b5b72e0a5525d6260ff897 *man/rodeo-class.Rd
+f2c969d40ac54aeef521476fb6e8f8c3 *man/rodeo-class.Rd
 d98e38b29587d7c1f0d3e7625947d403 *man/rodeo-package.Rd
 eef3714a2e09513afa830e959af4d8a0 *man/setPars.Rd
 7a81321cf6919546a4da7f0c4229f5d6 *man/setVars.Rd
 bc38cbae6cd05a5a7b17341fe7463925 *man/step.Rd
 4152b1cd3646435216868fba3cd84412 *man/stoi.Rd
 350f447f9775f2fe96a5c4bd617b34d7 *man/stoiCheck.Rd
-065cff6dc2dfb055acbaa6ebdfe0066e *man/stoiCreate.Rd
+a952d79bf043630c9c34320c138c325d *man/stoiCreate.Rd
 e29f31e73ad895ad4dc230008f6d3b47 *man/stoichiometry.Rd
 464de524a86ac16471eb9220e4841fb1 *man/vars.Rd
 3fad83e0418d6e74eb28d3c016d68dc2 *vignettes/examples/0D/streeterPhelpsLike/fig/system.odp
@@ -207,7 +207,7 @@ ad50c1a670b4a7e874b06c1f3a89dd20 *vignettes/examples/linked/waterSediment/single
 08a9d6aab19581022167546b820f1a30 *vignettes/examples/linked/waterSediment/xecute_singleObject.r
 a03d4300426ed1ee85c353a7462c0b9b *vignettes/preamble-latex.tex
 033a9de08856b81f38fccd183c8606d9 *vignettes/references.bib
-e74c80544659cc7e541c5b16ffecb76b *vignettes/rodeoVignette.Rmd
+e2b66437d3862c3fe65569618ec609a1 *vignettes/rodeoVignette.Rmd
 96cc4f86de0d69d3d0d18963644542b3 *vignettes/vignetteData/fig/overview.odg
 44f92c56ee10ae7064f38f50d055fed3 *vignettes/vignetteData/fig/overview.png
 4cf536fa3e01bfbbcc3674a7e55ed051 *vignettes/vignetteData/fig/reactor.odg

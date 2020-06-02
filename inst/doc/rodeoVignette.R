@@ -1,4 +1,4 @@
-## ---- echo=FALSE---------------------------------------------------------
+## ---- echo=FALSE--------------------------------------------------------------
 # Store output format for later use
 options(vignetteDocumentFormat= rmarkdown::all_output_formats("rodeoVignette.Rmd"))
 
