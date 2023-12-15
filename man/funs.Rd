@@ -6,9 +6,9 @@
 \title{Declaration of Functions}
 \format{
 A data frame with the following fields:
-  \itemize{
+  \describe{
     \item{name : }{Name of the function}
-    \item{units : }{Unit of the return value}
+    \item{unit : }{Unit of the return value}
     \item{description : }{Short description (text)}
   }
 }

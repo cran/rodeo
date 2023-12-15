@@ -6,9 +6,9 @@
 \title{Declaration of Processes}
 \format{
 A data frame with the following fields:
-  \itemize{
+  \describe{
     \item{name : }{Name of the process}
-    \item{units : }{Unit of the rate expression}
+    \item{unit : }{Unit of the rate expression}
     \item{description : }{Short description (text)}
     \item{expression : }{Mathematical expression (as a string)}
   }
