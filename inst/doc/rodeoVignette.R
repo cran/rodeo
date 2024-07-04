@@ -1,4 +1,4 @@
-## ---- echo=FALSE--------------------------------------------------------------
+## ----echo=FALSE---------------------------------------------------------------
 # Store output format for later use
 options(vignetteDocumentFormat= rmarkdown::all_output_formats("rodeoVignette.Rmd"))
 
@@ -11,7 +11,7 @@ options(xtable.caption.placement = 'top',
         xtable.booktabs = TRUE
   )
 
-## ---- echo=FALSE------------------------------------------------------------------------------------------------------
+## ----echo=FALSE-------------------------------------------------------------------------------------------------------
 library(rodeo)
 data(vars, pars, funs, pros, stoi)
 knitr::kable(vars, caption="Data set `vars`: Declaration of state variables.")
@@ -355,7 +355,7 @@ x <- rbind(
 colnames(x) <- c("Feature","Delimited text","Spreadsheet")
 knitr::kable(as.data.frame(x))
 
-## ---- stoiCreate, echo=FALSE------------------------------------------------------------------------------------------
+## ----stoiCreate, echo=FALSE-------------------------------------------------------------------------------------------
 reactions <- c(
   formationS= "A + 2 * B -> S",
   equilibrES= "E + S <-> ES",
@@ -364,7 +364,7 @@ reactions <- c(
 stoiMat <- stoiCreate(reactions, eval=TRUE, toRight="_fward", toLeft="_bward")
 print(stoiMat)
 
-## ---- ref.label='stoiCreate', echo=TRUE, eval=FALSE-------------------------------------------------------------------
+## ----ref.label='stoiCreate', echo=TRUE, eval=FALSE--------------------------------------------------------------------
 #  reactions <- c(
 #    formationS= "A + 2 * B -> S",
 #    equilibrES= "E + S <-> ES",
@@ -386,11 +386,11 @@ compMat <- rbind(
 )
 stoiCheck(stoiMat, compMat)
 
-## ---- cache=FALSE, echo=FALSE-----------------------------------------------------------------------------------------
+## ----cache=FALSE, echo=FALSE------------------------------------------------------------------------------------------
 # Set work folder
 knitr::opts_knit$set(root.dir="examples/0D/streeterPhelpsLike")
 
-## ---- echo=FALSE, results='asis', comment=''--------------------------------------------------------------------------
+## ----echo=FALSE, results='asis', comment=''---------------------------------------------------------------------------
 rd <- function(f) {read.table(f,sep="\t", header=TRUE)}
 knitr::kable(rd("vars.txt"), caption="Declaration of state variables (file 'vars.txt').")
 knitr::kable(rd("pars.txt"), caption="Declaration of parameters (file 'pars.txt').")
@@ -477,15 +477,15 @@ out <- model$dynamics(times=times, fortran=FALSE)
 # Plot, using the method for objects of class deSolve
 plot(out)   
 
-## ---- cache=FALSE, echo=FALSE-----------------------------------------------------------------------------------------
+## ----cache=FALSE, echo=FALSE------------------------------------------------------------------------------------------
 # Reset work folder
 knitr::opts_knit$set(root.dir=NULL)
 
-## ---- cache=FALSE, echo=FALSE-----------------------------------------------------------------------------------------
+## ----cache=FALSE, echo=FALSE------------------------------------------------------------------------------------------
 # Set work folder
 knitr::opts_knit$set(root.dir="examples/0D/twoZonesStirredTank")
 
-## ---- echo=FALSE, results='asis', comment=''--------------------------------------------------------------------------
+## ----echo=FALSE, results='asis', comment=''---------------------------------------------------------------------------
 rd <- function(f) {read.table(f ,sep="\t", header=TRUE)}
 knitr::kable(rd("vars.txt"), caption="Declaration of state variables (file 'vars.txt').")
 knitr::kable(rd("pars.txt"), caption="Declaration of parameters (file 'pars.txt').")
@@ -670,15 +670,15 @@ for (mu in MU) {
 }
 layout(1)
 
-## ---- cache=FALSE, echo=FALSE-----------------------------------------------------------------------------------------
+## ----cache=FALSE, echo=FALSE------------------------------------------------------------------------------------------
 # Reset work folder
 knitr::opts_knit$set(root.dir=NULL)
 
-## ---- cache=FALSE, echo=FALSE-----------------------------------------------------------------------------------------
+## ----cache=FALSE, echo=FALSE------------------------------------------------------------------------------------------
 # Set work folder
 knitr::opts_knit$set(root.dir="examples/1D/diffusion")
 
-## ---- echo=FALSE, results='asis', comment=''--------------------------------------------------------------------------
+## ----echo=FALSE, results='asis', comment=''---------------------------------------------------------------------------
 rd <- function(f) {read.table(f ,sep="\t", header=TRUE)}
 knitr::kable(rd("vars.txt"), caption="Declaration of state variables (file 'vars.txt').")
 knitr::kable(rd("pars.txt"), caption="Declaration of parameters (file 'pars.txt').")
@@ -810,15 +810,15 @@ for (t in times) {
 }
 layout(1)
 
-## ---- cache=FALSE, echo=FALSE-----------------------------------------------------------------------------------------
+## ----cache=FALSE, echo=FALSE------------------------------------------------------------------------------------------
 # Reset work folder
 knitr::opts_knit$set(root.dir=NULL)
 
-## ---- cache=FALSE, echo=FALSE-----------------------------------------------------------------------------------------
+## ----cache=FALSE, echo=FALSE------------------------------------------------------------------------------------------
 # Set work folder
 knitr::opts_knit$set(root.dir="examples/1D/advectionDispersion")
 
-## ---- echo=FALSE, results='asis', comment=''--------------------------------------------------------------------------
+## ----echo=FALSE, results='asis', comment=''---------------------------------------------------------------------------
 rd <- function(f) {read.table(f,sep="\t", header=TRUE)}
 knitr::kable(rd("vars.txt"), caption="Declaration of state variables (file 'vars.txt').")
 knitr::kable(rd("pars.txt"), caption="Declaration of parameters (file 'pars.txt').")
@@ -992,15 +992,15 @@ for (t in times) {
 }
 layout(1)
 
-## ---- cache=FALSE, echo=FALSE-----------------------------------------------------------------------------------------
+## ----cache=FALSE, echo=FALSE------------------------------------------------------------------------------------------
 # Reset work folder
 knitr::opts_knit$set(root.dir=NULL)
 
-## ---- cache=FALSE, echo=FALSE-----------------------------------------------------------------------------------------
+## ----cache=FALSE, echo=FALSE------------------------------------------------------------------------------------------
 # Set work folder
 knitr::opts_knit$set(root.dir="examples/1D/groundwater")
 
-## ---- echo=FALSE, results='asis', comment=''--------------------------------------------------------------------------
+## ----echo=FALSE, results='asis', comment=''---------------------------------------------------------------------------
 rd <- function(f) {read.table(f ,sep="\t", header=TRUE)}
 knitr::kable(rd("vars.txt"), caption="Declaration of state variables (file 'vars.txt').")
 knitr::kable(rd("pars.txt"), caption="Declaration of parameters (file 'pars.txt').")
@@ -1094,19 +1094,19 @@ filled.contour(x=out[,"time"]/365.25, y=(1:nx)*dx-dx/2,
   color.palette=colorRampPalette(c("steelblue2","lightyellow","darkorange")),
   key.title= mtext(side=3, "Ground water surf. (m)", padj=-0.5))
 
-## ---- cache=FALSE, echo=FALSE-----------------------------------------------------------------------------------------
+## ----cache=FALSE, echo=FALSE------------------------------------------------------------------------------------------
 # Reset work folder
 knitr::opts_knit$set(root.dir=NULL)
 
-## ---- cache=FALSE, echo=FALSE-----------------------------------------------------------------------------------------
+## ----cache=FALSE, echo=FALSE------------------------------------------------------------------------------------------
 # Set work folder
 knitr::opts_knit$set(root.dir="examples/1D/tetracycline")
 
-## ---- echo=FALSE, results='asis', comment=''--------------------------------------------------------------------------
+## ----echo=FALSE, results='asis', comment=''---------------------------------------------------------------------------
 rd <- function(f) {read.table(f ,sep="\t", header=TRUE)}
 knitr::kable(rd("vars.txt"), caption="Declaration of state variables (file 'vars.txt').")
 
-## ---- echo=FALSE, results='asis', comment=''--------------------------------------------------------------------------
+## ----echo=FALSE, results='asis', comment=''---------------------------------------------------------------------------
 x <- read.table("pros.txt" ,sep="\t", header=TRUE)
 capt <- "Definition of process rates (file 'pros.txt')"
 if (getOption("vignetteDocumentFormat") == "rmarkdown::pdf_document") {
@@ -1125,7 +1125,7 @@ if (getOption("vignetteDocumentFormat") == "rmarkdown::pdf_document") {
 }
 
 
-## ---- echo=FALSE, results='asis', comment=''--------------------------------------------------------------------------
+## ----echo=FALSE, results='asis', comment=''---------------------------------------------------------------------------
 x <- read.table("stoi.txt" ,sep="\t", header=TRUE)
 capt <- "Stoichiometric factors (file 'stoi.txt')"
 if (getOption("vignetteDocumentFormat") == "rmarkdown::pdf_document") {
@@ -1142,7 +1142,7 @@ if (getOption("vignetteDocumentFormat") == "rmarkdown::pdf_document") {
   stop("cannot figure out output document format for custom table formatting")
 }
 
-## ---- echo=FALSE, results='asis', comment=''--------------------------------------------------------------------------
+## ----echo=FALSE, results='asis', comment=''---------------------------------------------------------------------------
 rd <- function(f) {read.table(f ,sep="\t", header=TRUE)}
 knitr::kable(rd("pars.txt"), caption="Declaration of parameters (file 'pars.txt').")
 knitr::kable(rd("funs.txt"), caption="Declaration of functions (file 'funs.txt').")
@@ -1475,11 +1475,11 @@ legend("left", bty="n", title="% resistant", fill=colors,
 layout(1)
 par(mar=omar)
 
-## ---- cache=FALSE, echo=FALSE-----------------------------------------------------------------------------------------
+## ----cache=FALSE, echo=FALSE------------------------------------------------------------------------------------------
 # Reset work folder
 knitr::opts_knit$set(root.dir=NULL)
 
-## ---- cache=FALSE, echo=FALSE-----------------------------------------------------------------------------------------
+## ----cache=FALSE, echo=FALSE------------------------------------------------------------------------------------------
 # Set work folder
 knitr::opts_knit$set(root.dir="examples/linked/waterSediment")
 
@@ -1492,7 +1492,7 @@ x <- rbind(
 colnames(x) <- c("Link process", "Target obj.", "Target param.", "Source obj.", "Source item", "Source type")
 knitr::kable(as.data.frame(x))
 
-## ---- echo=FALSE, results='asis', comment=''--------------------------------------------------------------------------
+## ----echo=FALSE, results='asis', comment=''---------------------------------------------------------------------------
 rd <- function(f) {read.table(paste0("singleObject/",f) ,sep="\t", header=TRUE)}
 knitr::kable(rd("vars.txt"), caption="Declaration of state variables (file 'vars.txt').")
 knitr::kable(rd("pars.txt"), caption="Declaration of parameters (file 'pars.txt').")
@@ -1542,7 +1542,7 @@ out <- model$dynamics(times=times)
 # Plot method for deSolve objects
 plot(out)
 
-## ---- echo=FALSE, results='asis', comment=''--------------------------------------------------------------------------
+## ----echo=FALSE, results='asis', comment=''---------------------------------------------------------------------------
 rd <- function(f) {read.table(paste0("multiObject/",f) ,sep="\t", header=TRUE)}
 obj <- c(wat="water column", sed="sediment")
 
@@ -1680,7 +1680,7 @@ out <- cbind(time= times[2:length(times)], out)
 class(out) <- "deSolve"
 plot(out, mfrow=c(4,3))
 
-## ---- cache=FALSE, echo=FALSE-----------------------------------------------------------------------------------------
+## ----cache=FALSE, echo=FALSE------------------------------------------------------------------------------------------
 # Reset work folder
 knitr::opts_knit$set(root.dir=NULL)
 
