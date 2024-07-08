@@ -113,7 +113,7 @@ buildFromWorkbook <- function(workbook, dim=1, fortran=FALSE, sources=NULL, ...)
     }
   }
   # separate processes and stoichiometry
-  x[["stoi"]] <- with(x, as.matrix(eqns[,vars[,"name"]]))
+  x[["stoi"]] <- with(x, as.matrix(eqns[,vars[,"name"],drop=FALSE]))
   rownames(x[["stoi"]]) <- with(x, eqns[,"name"])
   x[["pros"]] <- with(x, eqns[,c("name","unit","rate","description")])
   names(x[["pros"]])[names(x[["pros"]]) == "rate"] <- "expression"

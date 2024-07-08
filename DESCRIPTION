@@ -2,8 +2,8 @@ Package: rodeo
 Type: Package
 NeedsCompilation: yes
 Title: A Code Generator for ODE-Based Models
-Version: 0.8.1
-Date: 2024-07-04
+Version: 0.8.2
+Date: 2024-07-08
 Author: David Kneis <david.kneis@tu-dresden.de>
 Maintainer: David Kneis <david.kneis@tu-dresden.de>
 Description: Provides an R6 class and several utility methods to
@@ -22,6 +22,6 @@ SystemRequirements: The tools to run 'R CMD SHLIB' on 'Fortran' code.
         which is a feature of the 2008 standard.
 Encoding: UTF-8
 RoxygenNote: 7.3.2
-Packaged: 2024-07-04 14:22:29 UTC; dkneis
+Packaged: 2024-07-08 13:46:43 UTC; dkneis
 Repository: CRAN
-Date/Publication: 2024-07-04 14:50:02 UTC
+Date/Publication: 2024-07-08 22:00:02 UTC

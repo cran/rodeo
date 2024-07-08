@@ -1,4 +1,4 @@
-7685b9e11d78693e871068299850410b *DESCRIPTION
+e4fb5aa1202739af0ce2346d82efcbc6 *DESCRIPTION
 f37ed5f7180137822c6c1e305357d33c *NAMESPACE
 7e4e9f65d19df7a815f4b5be84a6faed *R/0_package.r
 1a26a2fc6ac78591dd1675089b98a494 *R/class.r
@@ -19,7 +19,7 @@ faa07668c1919acd9e8ae1b41b9ce815 *R/classMethods_setValues.r
 98f96384a4ae6dbc60ae36a90348fe9c *R/data.r
 175c96183a063d128ba9ccc4046812ed *R/internal_constants.r
 cd26af412027485eed327912c5cd93e5 *R/internal_functions.r
-448cde29bf1b1950e8c2453ddaf3d396 *R/plainMethod_buildFromWorkbook.r
+fa7acee7f6eee9b0c92c54819a4439d6 *R/plainMethod_buildFromWorkbook.r
 64cea78e949649e934e774a62ccc7629 *R/plainMethod_exportDF.r
 0677d1076c920b302f37db149842a93f *R/plainMethod_forcingFunctions.r
 3505f21181657bec9a742c94311e068b *R/plainMethods_stoiBuild_stoiCheck.r
@@ -101,7 +101,7 @@ ad50c1a670b4a7e874b06c1f3a89dd20 *inst/doc/examples/linked/waterSediment/singleO
 08a9d6aab19581022167546b820f1a30 *inst/doc/examples/linked/waterSediment/xecute_singleObject.r
 64ab42ff0a4af0866770ebf78b9204c3 *inst/doc/rodeoVignette.R
 6c953a325c55254c35a511eaa4278624 *inst/doc/rodeoVignette.Rmd
-bc9766d967f8df33240cd21893749ff6 *inst/doc/rodeoVignette.pdf
+924b91e2fa1142b3e29396dd9481e9d1 *inst/doc/rodeoVignette.pdf
 96cc4f86de0d69d3d0d18963644542b3 *inst/doc/vignetteData/fig/overview.odg
 44f92c56ee10ae7064f38f50d055fed3 *inst/doc/vignetteData/fig/overview.png
 4cf536fa3e01bfbbcc3674a7e55ed051 *inst/doc/vignetteData/fig/reactor.odg
