@@ -10,7 +10,8 @@ if no external functions are required, the name of a single file, or a
 vector of file names. See notes below.}
 
 \item{fortran}{If \code{TRUE}, Fortran code is generated and compiled into a shared
-library. If \code{FALSE}, R code is generated.}
+library. If \code{FALSE}, R code is generated. The default was changed from
+\code{TRUE} to \code{FALSE} in package version 0.8.6).}
 
 \item{target}{Name of a 'target environment'. Currently, 'deSolve' is the
 only supported value.}
@@ -45,7 +46,9 @@ The expected language of the external code passed in \code{sources}
   If \code{fortran} is \code{TRUE}, the external code passed in 
   \code{sources} must implement a module with the fixed name 'functions'.
   This module must contain all user-defined functions referenced in process
-  rates or stoichiometric factors.
+  rates or stoichiometric factors. The file names passed to the
+  \code{sources} argument must carry an extension which is recognized by
+  the compiler as a source file. Something like ".f95" should work.
 
   If \code{fortran} is \code{TRUE}, a shared library is created. The library
   is immediately loaded with \code{\link[base]{dyn.load}} and it is

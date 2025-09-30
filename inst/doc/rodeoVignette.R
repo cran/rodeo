@@ -31,8 +31,8 @@ model <- rodeo$new(vars=vars, pars=pars, funs=funs,
   pros=pros, stoi=stoi, dim=c(1))
 
 ## ----inspectObject, echo=TRUE, eval=FALSE-----------------------------------------------------------------------------
-#  print(model)                   # Displays object members (output not shown)
-#  print(model$stoichiometry())   # Shows stoichiometry as a matrix
+# print(model)                   # Displays object members (output not shown)
+# print(model$stoichiometry())   # Shows stoichiometry as a matrix
 
 ## ----defNormalFunctions, echo=TRUE, eval=TRUE-------------------------------------------------------------------------
 monod <- function(c, h) { c / (c + h) }
@@ -49,8 +49,8 @@ print(signif(m, 3))
 model$compile(fortran=FALSE)
 
 ## ----solveSingleBoxR, echo=TRUE, eval=FALSE, results='hide'-----------------------------------------------------------
-#  out <- model$dynamics(times=0:96, fortran=FALSE)
-#  plot(out)  # plot method for 'deSolve' objects
+# out <- model$dynamics(times=0:96, fortran=FALSE)
+# plot(out)  # plot method for 'deSolve' objects
 
 ## ----ref.label='solveSingleBoxR', echo=FALSE, eval=TRUE---------------------------------------------------------------
 out <- model$dynamics(times=0:96, fortran=FALSE)
@@ -146,13 +146,13 @@ model$setPars(p)
 out <- model$dynamics(times=0:120, fortran=FALSE)
 
 ## ----ref.label='plotMultiBox', echo=TRUE, eval=FALSE------------------------------------------------------------------
-#  layout(matrix(1:model$lenVars(), nrow=1))
-#  for (vn in model$namesVars()) {
-#    matplot(out[,"time"], out[,paste(vn, 1:nBox, sep=".")],
-#      type="l", xlab="time", ylab=vn, lty=1:nBox, col=1:nBox)
-#    legend("right", bty="n", lty=1:nBox, col=1:nBox, legend=paste("box",1:nBox))
-#  }
-#  layout(1)
+# layout(matrix(1:model$lenVars(), nrow=1))
+# for (vn in model$namesVars()) {
+#   matplot(out[,"time"], out[,paste(vn, 1:nBox, sep=".")],
+#     type="l", xlab="time", ylab=vn, lty=1:nBox, col=1:nBox)
+#   legend("right", bty="n", lty=1:nBox, col=1:nBox, legend=paste("box",1:nBox))
+# }
+# layout(1)
 
 ## ----ref.label='plotMultiBox', echo=FALSE, eval=TRUE, fig.height=4----------------------------------------------------
 layout(matrix(1:model$lenVars(), nrow=1))
@@ -164,10 +164,11 @@ for (vn in model$namesVars()) {
 layout(1)
 
 ## ----echo=TRUE, eval=FALSE--------------------------------------------------------------------------------------------
-#  code <- model$generate(name="derivs",lang="f95")    # not required for typical uses
+# code <- model$generate(name="derivs",lang="f95")    # not required for typical uses
 
 ## ----compileMultiBox, echo=TRUE, eval=FALSE---------------------------------------------------------------------------
-#  model$compile(sources="vignetteData/fortran/functionsCode.f95")
+# model$compile(sources="vignetteData/fortran/functionsCode.f95",
+#   fortran=TRUE)
 
 ## ----echo=FALSE, eval=TRUE, comment=''--------------------------------------------------------------------------------
 file_ffuns <- "vignetteData/fortran/functionsCode.f95"
@@ -195,19 +196,20 @@ p <- cbind(mu=rp(0.8), half=rp(0.1), yield= rp(0.1),
 model$setPars(p)
 
 ## ----ref.label='compileMultiBox', echo=TRUE, eval=TRUE----------------------------------------------------------------
-model$compile(sources="vignetteData/fortran/functionsCode.f95")
+model$compile(sources="vignetteData/fortran/functionsCode.f95",
+  fortran=TRUE)
 
 ## ----solveMultiBoxF, echo=TRUE, eval=TRUE-----------------------------------------------------------------------------
-out <- model$dynamics(times=0:120)
+out <- model$dynamics(times=0:120, fortran=TRUE)
 
 ## ----ref.label='plotMultiBox', echo=TRUE, eval=FALSE------------------------------------------------------------------
-#  layout(matrix(1:model$lenVars(), nrow=1))
-#  for (vn in model$namesVars()) {
-#    matplot(out[,"time"], out[,paste(vn, 1:nBox, sep=".")],
-#      type="l", xlab="time", ylab=vn, lty=1:nBox, col=1:nBox)
-#    legend("right", bty="n", lty=1:nBox, col=1:nBox, legend=paste("box",1:nBox))
-#  }
-#  layout(1)
+# layout(matrix(1:model$lenVars(), nrow=1))
+# for (vn in model$namesVars()) {
+#   matplot(out[,"time"], out[,paste(vn, 1:nBox, sep=".")],
+#     type="l", xlab="time", ylab=vn, lty=1:nBox, col=1:nBox)
+#   legend("right", bty="n", lty=1:nBox, col=1:nBox, legend=paste("box",1:nBox))
+# }
+# layout(1)
 
 ## ----ref.label='plotMultiBox', echo=FALSE, eval=TRUE, fig.height=4----------------------------------------------------
 layout(matrix(1:model$lenVars(), nrow=1))
@@ -238,19 +240,108 @@ text <- readLines("vignetteData/fortran/fortranForcingsTest.f95",
 text <- paste(text,"\n")
 cat(text)
 
+## ----eval=TRUE, echo=TRUE---------------------------------------------------------------------------------------------
+local({
+
+# Simulation of heat exchange to demonstrate the implementation of
+# time-varying external forcings in a Fortran-compiled rodeo model.
+#
+#                  +-------------+
+#                  |             |
+#         Tamb  <=====>  Tsys    |
+#                  |             |
+#                  +-------------+
+#
+# d/dt Tsys = k * (Tamb(time) - Tsys)
+# 
+# Note that using rodeo (and Fortran code in particular) for this
+# very basic example is nothing but overkill.
+
+library("rodeo")
+
+# Creation of the model object
+vars <- data.frame(
+  name="Tsys", unit="°C", description="System temperature")
+pars <- data.frame(
+  name="k", unit="1/s", description="Heat exchange coefficient")
+funs <- data.frame(
+  name="Tamb", unit="°C", description="Variable ambient temperature")
+pros <- data.frame(
+  name="transfer", unit="°C/s", description="Heat transfer",
+  expression="k * (Tamb(time) - Tsys)")
+stoi <- data.frame(
+  variable="Tsys", process="transfer", expression=1)
+M <- rodeo$new(vars=vars, pars=pars, funs=funs, pros=pros, stoi=stoi)
+
+# Assumed time series of ambient temperature; written to disk
+file_data <- tempfile()
+Tamb_data <- data.frame(time=c(0, 60, 120, 1000), celsius=c(0, 20, 0 ,0))
+write.table(Tamb_data, file=file_data, sep="\t", col.names=T, row.names=F)
+
+# Create table connecting external forcings to data files
+x <- data.frame(name="Tamb", file=file_data, column="celsius",
+  mode=-1, default=F)
+
+# Generate fortran code providing routines to import/query external forcings
+file_code1 <- tempfile(fileext=".f95")
+write(file=file_code1, forcingFunctions(x))
+
+# Write fortran code to import the just generated code
+file_code2 <- tempfile(fileext=".f95")
+write(file=file_code2, "
+module functions     ! mandatory if the model contains any functions \n
+use forcings         ! just created by call to 'forcingFunctions'    \n
+contains             ! nothing to add after 'contains' here          \n
+end module                                                           \n
+")
+
+# Compile the model
+M$compile(sources=c(file_code1, file_code2), fortran=T)
+
+# Initialize data
+M$setPars(c(k=0.01))   # Parameters
+M$setVars(c(Tsys=5))   # State variables
+M$forcings_init()      # Reads forcing data from disk into memory
+
+# Simulate dynamics
+times <- 0:240
+simul1 <- M$dynamics(times=times, fortran=T)
+
+# Reference simulation using plain R/deSolve
+derivs <- function(time, y, p) {
+  ddt <- with(as.list(c(y,p)), {
+    c(Tsys = k * (Tamb(time) - Tsys))
+  })
+  list(ddt)
+}
+Tamb <- approxfun(x=Tamb_data[,"time"], y=Tamb_data[,"celsius"])
+simul2 <- deSolve::lsoda(y=c(Tsys=5), func=derivs, times=times,
+  parms=c(k=0.01))
+
+# Compare outcomes
+par(mfcol=c(1,2))
+plot(simul1[,c("time","Tsys")], type="l", main="fortran/rodeo")
+plot(simul2[,c("time","Tsys")], type="l", main="plain R")
+par(mfcol=c(1,1))
+
+# Explicit clean-up (not needed in typical settings)
+M$forcings_clear()
+
+}) # end local
+
 ## ----exportTex, echo=TRUE, eval=FALSE---------------------------------------------------------------------------------
-#  # Select columns to export
-#  df <- model$getVarsTable()[,c("tex","unit","description")]
-#  # Define formatting functions
-#  bold <- function(x){paste0("\\textbf{",x,"}")}
-#  mathmode <- function(x) {paste0("$",x,"$")}
-#  # Export
-#  tex <- exportDF(x=df, tex=TRUE,
-#    colnames=c(tex="symbol"),
-#    funHead=setNames(replicate(ncol(df),bold),names(df)),
-#    funCell=list(tex=mathmode)
-#  )
-#  cat(tex)
+# # Select columns to export
+# df <- model$getVarsTable()[,c("tex","unit","description")]
+# # Define formatting functions
+# bold <- function(x){paste0("\\textbf{",x,"}")}
+# mathmode <- function(x) {paste0("$",x,"$")}
+# # Export
+# tex <- exportDF(x=df, tex=TRUE,
+#   colnames=c(tex="symbol"),
+#   funHead=setNames(replicate(ncol(df),bold),names(df)),
+#   funCell=list(tex=mathmode)
+# )
+# cat(tex)
 
 ## ----ref.label='exportTex', echo=FALSE, eval=TRUE, comment=''---------------------------------------------------------
 # Select columns to export
@@ -267,13 +358,13 @@ tex <- exportDF(x=df, tex=TRUE,
 cat(tex)
 
 ## ----exportMarkdown, echo=TRUE, eval=FALSE----------------------------------------------------------------------------
-#  knitr::kable(model$getVarsTable()[,c("name","unit","description")])
+# knitr::kable(model$getVarsTable()[,c("name","unit","description")])
 
 ## ----ref.label='exportMarkdown', echo=FALSE, eval=TRUE, comment=''----------------------------------------------------
 knitr::kable(model$getVarsTable()[,c("name","unit","description")])
 
 ## ----plotStoichiometry, echo=TRUE, eval=FALSE-------------------------------------------------------------------------
-#  model$plotStoichiometry(box=1, time=0, cex=0.8)
+# model$plotStoichiometry(box=1, time=0, cex=0.8)
 
 ## ----echo=FALSE, eval=TRUE--------------------------------------------------------------------------------------------
 omar <- par("mar")
@@ -324,14 +415,14 @@ html <- paste("<html>", html, "</html>", sep="\n")
 # write(html, file="stoichiometry.html")
 
 ## ----stoiMarkdown, echo=TRUE, eval=FALSE------------------------------------------------------------------------------
-#  signsymbol <- function(x) {
-#    if (as.numeric(x) > 0) return("$\\color{red}{\\blacktriangle}$")
-#    if (as.numeric(x) < 0) return("$\\color{blue}{\\blacktriangledown}$")
-#    return("")
-#  }
-#  m <- model$stoichiometry(box=1, time=0)
-#  m <- apply(m, MARGIN = c(1, 2), signsymbol)
-#  knitr::kable(m)
+# signsymbol <- function(x) {
+#   if (as.numeric(x) > 0) return("$\\color{red}{\\blacktriangle}$")
+#   if (as.numeric(x) < 0) return("$\\color{blue}{\\blacktriangledown}$")
+#   return("")
+# }
+# m <- model$stoichiometry(box=1, time=0)
+# m <- apply(m, MARGIN = c(1, 2), signsymbol)
+# knitr::kable(m)
 
 ## ----ref.label='stoiMarkdown', echo=FALSE, eval=TRUE------------------------------------------------------------------
 signsymbol <- function(x) {
@@ -365,13 +456,13 @@ stoiMat <- stoiCreate(reactions, eval=TRUE, toRight="_fward", toLeft="_bward")
 print(stoiMat)
 
 ## ----ref.label='stoiCreate', echo=TRUE, eval=FALSE--------------------------------------------------------------------
-#  reactions <- c(
-#    formationS= "A + 2 * B -> S",
-#    equilibrES= "E + S <-> ES",
-#    decomposES= "ES -> E + P"
-#  )
-#  stoiMat <- stoiCreate(reactions, eval=TRUE, toRight="_fward", toLeft="_bward")
-#  print(stoiMat)
+# reactions <- c(
+#   formationS= "A + 2 * B -> S",
+#   equilibrES= "E + S <-> ES",
+#   decomposES= "ES -> E + P"
+# )
+# stoiMat <- stoiCreate(reactions, eval=TRUE, toRight="_fward", toLeft="_bward")
+# print(stoiMat)
 
 ## ---------------------------------------------------------------------------------------------------------------------
 reac <- c(oxidation="C6H12O6 + 6 * O2 -> 6 * CO2 + 6 * H2O")
@@ -402,42 +493,42 @@ knitr::kable(rd("stoi.txt"), caption="Definition of stoichiometric factors (file
 knitr::read_chunk("xecute.r")
 
 ## ----ref.label='streeterPhelpsLike', echo=TRUE, eval=FALSE------------------------------------------------------------
-#  rm(list=ls())
-#  
-#  # Adjustable settings ##########################################################
-#  pars <- c(kd=1, ka=0.5, s=2.76, temp=20)  # parameters
-#  vars <- c(OM=1, DO=9.02)                  # initial values
-#  times <- seq(from=0, to=10, by=1/24)      # times of interest
-#  # End of settings ##############################################################
-#  
-#  # Load required packages
-#  library("deSolve")
-#  library("rodeo")
-#  
-#  # Initialize rodeo object
-#  rd <- function(f, ...) {read.table(file=f,
-#    header=TRUE, sep="\t", stringsAsFactors=FALSE, ...) }
-#  model <- rodeo$new(vars=rd("vars.txt"), pars=rd("pars.txt"), funs=rd("funs.txt"),
-#    pros=rd("pros.txt"), stoi=as.matrix(rd("stoi.txt", row.names="process")),
-#    asMatrix=TRUE, dim=c(1))
-#  
-#  # Assign initial values and parameters
-#  model$setVars(vars)
-#  model$setPars(pars)
-#  
-#  # Implement required functions
-#  DOsat <- function(t) {
-#    14.652 - 0.41022*t + 7.991e-3*(t**2) - 7.7774e-5*(t**3)
-#  }
-#  
-#  # Generate R code
-#  model$compile(fortran=FALSE)
-#  
-#  # Integrate
-#  out <- model$dynamics(times=times, fortran=FALSE)
-#  
-#  # Plot, using the method for objects of class deSolve
-#  plot(out)
+# rm(list=ls())
+# 
+# # Adjustable settings ##########################################################
+# pars <- c(kd=1, ka=0.5, s=2.76, temp=20)  # parameters
+# vars <- c(OM=1, DO=9.02)                  # initial values
+# times <- seq(from=0, to=10, by=1/24)      # times of interest
+# # End of settings ##############################################################
+# 
+# # Load required packages
+# library("deSolve")
+# library("rodeo")
+# 
+# # Initialize rodeo object
+# rd <- function(f, ...) {read.table(file=f,
+#   header=TRUE, sep="\t", stringsAsFactors=FALSE, ...) }
+# model <- rodeo$new(vars=rd("vars.txt"), pars=rd("pars.txt"), funs=rd("funs.txt"),
+#   pros=rd("pros.txt"), stoi=as.matrix(rd("stoi.txt", row.names="process")),
+#   asMatrix=TRUE, dim=c(1))
+# 
+# # Assign initial values and parameters
+# model$setVars(vars)
+# model$setPars(pars)
+# 
+# # Implement required functions
+# DOsat <- function(t) {
+#   14.652 - 0.41022*t + 7.991e-3*(t**2) - 7.7774e-5*(t**3)
+# }
+# 
+# # Generate R code
+# model$compile(fortran=FALSE)
+# 
+# # Integrate
+# out <- model$dynamics(times=times, fortran=FALSE)
+# 
+# # Plot, using the method for objects of class deSolve
+# plot(out)
 
 ## ----ref.label='streeterPhelpsLike', echo=FALSE, eval=TRUE, fig.height=6----------------------------------------------
 rm(list=ls())
@@ -497,91 +588,91 @@ knitr::kable(rd("stoi.txt"), caption="Definition of stoichiometric factors (file
 knitr::read_chunk("xecute.r")
 
 ## ----ref.label='twoZonesStirredTank', echo=TRUE, eval=FALSE-----------------------------------------------------------
-#  rm(list=ls())
-#  
-#  # Adjustable settings ##########################################################
-#  vars <- c(bM=0, bS=0, sM=0, sS=0)                       # initial values
-#  pars <- c(vol=1000, fS=NA, qM=200, qS=NA,               # fixed parameter values
-#    bX=1, sX=20, mu=NA, yield=0.1, half=0.1)
-#  sensList <- list(                                       # parameter values for
-#    fS= seq(from=0.02, to=0.5, by=0.02),                  # sensitivity analysis
-#    qS= seq(from=2, to=200, by=2),
-#    mu= c(0.07, 0.1, 0.15)
-#  )
-#  commonScale <- TRUE                                     # controls color scale
-#  # End of settings ##############################################################
-#  
-#  # Load packages
-#  library("rootSolve")
-#  library("rodeo")
-#  
-#  # Initialize rodeo object
-#  rd <- function(f, ...) {read.table(file=f,
-#    header=TRUE, sep="\t", stringsAsFactors=FALSE, ...) }
-#  
-#  model <- rodeo$new(vars=rd("vars.txt"), pars=rd("pars.txt"), funs=NULL,
-#    pros=rd("pros.txt"), stoi=as.matrix(rd("stoi.txt", row.names="process")),
-#    asMatrix=TRUE, dim=c(1))
-#  
-#  # Assign initial values and parameters
-#  model$setVars(vars)
-#  model$setPars(pars)
-#  
-#  # Generate code, compile into shared library, load library
-#  model$compile(NULL)
-#  
-#  # Function to return the steady-state solution for specific parameters
-#  f <- function(x) {
-#    testPars <- pars
-#    testPars[names(sensList)] <- x[names(sensList)]
-#    model$setPars(testPars)
-#    st <- rootSolve::runsteady(y=model$getVars(), times=c(0, Inf),
-#      func=model$libFunc(), parms=model$getPars(), dllname=model$libName(),
-#      nout=model$lenPros(), outnames=model$namesPros())
-#    if (!attr(st, "steady"))
-#      st$y <- rep(NA, length(st$y))
-#    setNames(st$y, model$namesVars())
-#  }
-#  
-#  # Set up parameter sets
-#  sensSets <- expand.grid(sensList)
-#  
-#  # Apply model to all sets and store results as array
-#  out <- array(apply(sensSets, 1, f),
-#    dim=c(model$lenVars(), lapply(sensList, length)),
-#    dimnames=c(list(model$namesVars()), sensList))
-#  
-#  # Plot results of sensitivity analysis
-#  xlab <- "Sub-tank volume / Total vol."
-#  ylab <- "Flow through sub-tank"
-#  VAR <- c("bM", "bS")
-#  MU <- as.character(sensList[["mu"]])
-#  
-#  if (commonScale) {
-#    breaks <- pretty(out[VAR,,,MU], 15)
-#    colors <- colorRampPalette(c("steelblue2","lightyellow","orange2"))(length(breaks)-1)
-#  }
-#  
-#  layout(matrix(1:((length(VAR)+1)*length(MU)), ncol=length(VAR)+1,
-#    nrow=length(MU), byrow=TRUE))
-#  for (mu in MU) {
-#    if (!commonScale) {
-#      breaks <- pretty(out[VAR,,,mu], 15)
-#      colors <- colorRampPalette(c("steelblue2","lightyellow","orange2"))(length(breaks)-1)
-#    }
-#    for (var in VAR) {
-#      image(x=as.numeric(rownames(out[var,,,mu])),
-#        y=as.numeric(colnames(out[var,,,mu])), z=out[var,,,mu],
-#        breaks=breaks, col=colors, xlab=xlab, ylab=ylab)
-#      mtext(side=3, var, cex=par("cex"))
-#      legend("topright", bty="n", legend=paste("mu=",mu))
-#    }
-#    plot.new()
-#    br <- round(breaks, 1)
-#    legend("topleft", bty="n", ncol= 2, fill=colors,
-#      legend=paste(br[-length(br)],br[-1],sep="-"))
-#  }
-#  layout(1)
+# rm(list=ls())
+# 
+# # Adjustable settings ##########################################################
+# vars <- c(bM=0, bS=0, sM=0, sS=0)                       # initial values
+# pars <- c(vol=1000, fS=NA, qM=200, qS=NA,               # fixed parameter values
+#   bX=1, sX=20, mu=NA, yield=0.1, half=0.1)
+# sensList <- list(                                       # parameter values for
+#   fS= seq(from=0.02, to=0.5, by=0.02),                  # sensitivity analysis
+#   qS= seq(from=2, to=200, by=2),
+#   mu= c(0.07, 0.1, 0.15)
+# )
+# commonScale <- TRUE                                     # controls color scale
+# # End of settings ##############################################################
+# 
+# # Load packages
+# library("rootSolve")
+# library("rodeo")
+# 
+# # Initialize rodeo object
+# rd <- function(f, ...) {read.table(file=f,
+#   header=TRUE, sep="\t", stringsAsFactors=FALSE, ...) }
+# 
+# model <- rodeo$new(vars=rd("vars.txt"), pars=rd("pars.txt"), funs=NULL,
+#   pros=rd("pros.txt"), stoi=as.matrix(rd("stoi.txt", row.names="process")),
+#   asMatrix=TRUE, dim=c(1))
+# 
+# # Assign initial values and parameters
+# model$setVars(vars)
+# model$setPars(pars)
+# 
+# # Generate code, compile into shared library, load library
+# model$compile(NULL, fortran=TRUE)
+# 
+# # Function to return the steady-state solution for specific parameters
+# f <- function(x) {
+#   testPars <- pars
+#   testPars[names(sensList)] <- x[names(sensList)]
+#   model$setPars(testPars)
+#   st <- rootSolve::runsteady(y=model$getVars(), times=c(0, Inf),
+#     func=model$libFunc(), parms=model$getPars(), dllname=model$libName(),
+#     nout=model$lenPros(), outnames=model$namesPros())
+#   if (!attr(st, "steady"))
+#     st$y <- rep(NA, length(st$y))
+#   setNames(st$y, model$namesVars())
+# }
+# 
+# # Set up parameter sets
+# sensSets <- expand.grid(sensList)
+# 
+# # Apply model to all sets and store results as array
+# out <- array(apply(sensSets, 1, f),
+#   dim=c(model$lenVars(), lapply(sensList, length)),
+#   dimnames=c(list(model$namesVars()), sensList))
+# 
+# # Plot results of sensitivity analysis
+# xlab <- "Sub-tank volume / Total vol."
+# ylab <- "Flow through sub-tank"
+# VAR <- c("bM", "bS")
+# MU <- as.character(sensList[["mu"]])
+# 
+# if (commonScale) {
+#   breaks <- pretty(out[VAR,,,MU], 15)
+#   colors <- colorRampPalette(c("steelblue2","lightyellow","orange2"))(length(breaks)-1)
+# }
+# 
+# layout(matrix(1:((length(VAR)+1)*length(MU)), ncol=length(VAR)+1,
+#   nrow=length(MU), byrow=TRUE))
+# for (mu in MU) {
+#   if (!commonScale) {
+#     breaks <- pretty(out[VAR,,,mu], 15)
+#     colors <- colorRampPalette(c("steelblue2","lightyellow","orange2"))(length(breaks)-1)
+#   }
+#   for (var in VAR) {
+#     image(x=as.numeric(rownames(out[var,,,mu])),
+#       y=as.numeric(colnames(out[var,,,mu])), z=out[var,,,mu],
+#       breaks=breaks, col=colors, xlab=xlab, ylab=ylab)
+#     mtext(side=3, var, cex=par("cex"))
+#     legend("topright", bty="n", legend=paste("mu=",mu))
+#   }
+#   plot.new()
+#   br <- round(breaks, 1)
+#   legend("topleft", bty="n", ncol= 2, fill=colors,
+#     legend=paste(br[-length(br)],br[-1],sep="-"))
+# }
+# layout(1)
 
 ## ----ref.label='twoZonesStirredTank', echo=FALSE, eval=TRUE, fig.height=8---------------------------------------------
 rm(list=ls())
@@ -615,7 +706,7 @@ model$setVars(vars)
 model$setPars(pars)
 
 # Generate code, compile into shared library, load library
-model$compile(NULL)
+model$compile(NULL, fortran=TRUE)
 
 # Function to return the steady-state solution for specific parameters
 f <- function(x) {
@@ -689,65 +780,66 @@ knitr::kable(rd("stoi.txt"), caption="Definition of stoichiometric factors (file
 knitr::read_chunk("xecute.r")
 
 ## ----ref.label='diffusion', echo=TRUE, eval=FALSE---------------------------------------------------------------------
-#  rm(list=ls())
-#  
-#  # Adjustable settings ##########################################################
-#  dx <- 0.01                           # spatial discretization (m)
-#  nCells <- 100                        # number of layers (-)
-#  d <- 5e-9                            # diffusion coefficient (m2/s)
-#  cb <- 1                              # boundary concentr. at all times (mol/m3)
-#  times <- c(0,1,6,14,30,89)*86400     # times of interest (seconds)
-#  # End of settings ##############################################################
-#  
-#  # Load packages
-#  library("deSolve")
-#  library("rodeo")
-#  
-#  # Initialize rodeo object
-#  rd <- function(f, ...) {read.table(file=f,
-#    header=TRUE, sep="\t", stringsAsFactors=FALSE, ...) }
-#  model <- rodeo$new(vars=rd("vars.txt"), pars=rd("pars.txt"), funs=NULL,
-#    pros=rd("pros.txt"), stoi=as.matrix(rd("stoi.txt", row.names="process")),
-#    asMatrix=TRUE, dim=c(nCells))
-#  
-#  # Assign initial values and parameters
-#  model$setVars(cbind(c=rep(0, nCells)))
-#  model$setPars(cbind(d=d, dx=dx,cb=cb,
-#    leftmost= c(1, rep(0, nCells-1))
-#  ))
-#  
-#  # Generate code, compile into shared library, load library
-#  model$compile(NULL)
-#  
-#  # Numeric solution
-#  solNum <- model$dynamics(times=times, jactype="bandint", bandup=1, banddown=1)
-#  
-#  # Function providing the analytical solution
-#  erfc <- function(x) { 2 * pnorm(x * sqrt(2), lower=FALSE) }
-#  solAna <- function (x,t,d,cb) { cb * erfc(x / 2 / sqrt(d*t)) }
-#  
-#  # Graphically compare numerical and analytical solution
-#  nc <- 2
-#  nr <- ceiling(length(times) / nc)
-#  layout(matrix(1:(nc*nr), ncol=nc, byrow=TRUE))
-#  par(mar=c(4,4,1,1))
-#  for (t in times) {
-#    plot(c(0,nCells*dx), c(0,cb), type="n", xlab="Station (m)", ylab="mol/m3")
-#    # Numeric solution (stair steps of cell-average)
-#    stations <- seq(from=0, by=dx, length.out=nCells+1)
-#    concs <- solNum[solNum[,1]==t, paste0("c.",1:nCells)]
-#    lines(stations, c(concs,concs[length(concs)]), type="s", col="steelblue4")
-#    # Analytical solution (for center of cells)
-#    stations <- seq(from=dx/2, to=(nCells*dx)-dx/2, by=dx)
-#    concs <- solAna(x=stations, t=t, d=d, cb=cb)
-#    lines(stations, concs, col="red", lty=2)
-#    # Extras
-#    legend("topright", bty="n", paste("After",t/86400,"days"))
-#    if (t == times[1]) legend("right",lty=1:2,
-#      col=c("steelblue4","red"),legend=c("Numeric", "Exact"),bty="n")
-#    abline(v=0)
-#  }
-#  layout(1)
+# rm(list=ls())
+# 
+# # Adjustable settings ##########################################################
+# dx <- 0.01                           # spatial discretization (m)
+# nCells <- 100                        # number of layers (-)
+# d <- 5e-9                            # diffusion coefficient (m2/s)
+# cb <- 1                              # boundary concentr. at all times (mol/m3)
+# times <- c(0,1,6,14,30,89)*86400     # times of interest (seconds)
+# # End of settings ##############################################################
+# 
+# # Load packages
+# library("deSolve")
+# library("rodeo")
+# 
+# # Initialize rodeo object
+# rd <- function(f, ...) {read.table(file=f,
+#   header=TRUE, sep="\t", stringsAsFactors=FALSE, ...) }
+# model <- rodeo$new(vars=rd("vars.txt"), pars=rd("pars.txt"), funs=NULL,
+#   pros=rd("pros.txt"), stoi=as.matrix(rd("stoi.txt", row.names="process")),
+#   asMatrix=TRUE, dim=c(nCells))
+# 
+# # Assign initial values and parameters
+# model$setVars(cbind(c=rep(0, nCells)))
+# model$setPars(cbind(d=d, dx=dx,cb=cb,
+#   leftmost= c(1, rep(0, nCells-1))
+# ))
+# 
+# # Generate code, compile into shared library, load library
+# model$compile(NULL, fortran=TRUE)
+# 
+# # Numeric solution
+# solNum <- model$dynamics(times=times, jactype="bandint", bandup=1,
+#   banddown=1, fortran=TRUE)
+# 
+# # Function providing the analytical solution
+# erfc <- function(x) { 2 * pnorm(x * sqrt(2), lower=FALSE) }
+# solAna <- function (x,t,d,cb) { cb * erfc(x / 2 / sqrt(d*t)) }
+# 
+# # Graphically compare numerical and analytical solution
+# nc <- 2
+# nr <- ceiling(length(times) / nc)
+# layout(matrix(1:(nc*nr), ncol=nc, byrow=TRUE))
+# par(mar=c(4,4,1,1))
+# for (t in times) {
+#   plot(c(0,nCells*dx), c(0,cb), type="n", xlab="Station (m)", ylab="mol/m3")
+#   # Numeric solution (stair steps of cell-average)
+#   stations <- seq(from=0, by=dx, length.out=nCells+1)
+#   concs <- solNum[solNum[,1]==t, paste0("c.",1:nCells)]
+#   lines(stations, c(concs,concs[length(concs)]), type="s", col="steelblue4")
+#   # Analytical solution (for center of cells)
+#   stations <- seq(from=dx/2, to=(nCells*dx)-dx/2, by=dx)
+#   concs <- solAna(x=stations, t=t, d=d, cb=cb)
+#   lines(stations, concs, col="red", lty=2)
+#   # Extras
+#   legend("topright", bty="n", paste("After",t/86400,"days"))
+#   if (t == times[1]) legend("right",lty=1:2,
+#     col=c("steelblue4","red"),legend=c("Numeric", "Exact"),bty="n")
+#   abline(v=0)
+# }
+# layout(1)
 
 ## ----ref.label='diffusion', echo=FALSE, eval=TRUE---------------------------------------------------------------------
 rm(list=ls())
@@ -778,10 +870,11 @@ model$setPars(cbind(d=d, dx=dx,cb=cb,
 ))
 
 # Generate code, compile into shared library, load library
-model$compile(NULL)              
+model$compile(NULL, fortran=TRUE)              
 
 # Numeric solution
-solNum <- model$dynamics(times=times, jactype="bandint", bandup=1, banddown=1)
+solNum <- model$dynamics(times=times, jactype="bandint", bandup=1,
+  banddown=1, fortran=TRUE)
 
 # Function providing the analytical solution
 erfc <- function(x) { 2 * pnorm(x * sqrt(2), lower=FALSE) }
@@ -835,83 +928,83 @@ cat(paste(text,"\n"))
 knitr::read_chunk("xecute.r")
 
 ## ----ref.label='advectionDispersion', echo=TRUE, eval=FALSE-----------------------------------------------------------
-#  rm(list=ls())
-#  
-#  # Adjustable settings ##########################################################
-#  fileFun <- "functions.f95"
-#  u <- 1                                 # advective velocity (m/s)
-#  d <- 30                                # longit. dispersion coefficient (m2/s)
-#  wetArea <- 50                          # wet cross-section area (m2)
-#  dx <- 10                               # length of a sub-section (m)
-#  nCells <- 1000                         # number of sub-sections
-#  inputCell <- 100                       # index of sub-section with tracer input
-#  inputMass <- 10                        # input mass (g)
-#  times <- c(0,30,60,600,1800,3600)      # times (seconds)
-#  # End of settings ##############################################################
-#  
-#  # Load packages
-#  library("deSolve")
-#  library("rodeo")
-#  
-#  # Make sure that vector of times starts with zero
-#  times <- sort(unique(c(0, times)))
-#  
-#  # Initialize rodeo object
-#  rd <- function(f) {read.table(file=f,
-#    header=TRUE, sep="\t", stringsAsFactors=FALSE) }
-#  model <- rodeo$new(vars=rd("vars.txt"), pars=rd("pars.txt"),
-#    funs=rd("funs.txt"), pros=rd("pros.txt"), stoi=rd("stoi.txt"),
-#    asMatrix=FALSE, dim=c(nCells))
-#  
-#  # Numerical dispersion for backward finite-difference approx. of advection term
-#  dNum <- u*dx/2
-#  
-#  # Assign initial values and parameters
-#  model$setVars(cbind(
-#    c=ifelse((1:nCells)==inputCell, inputMass/wetArea/dx, 0)
-#  ))
-#  model$setPars(cbind(
-#    u=u, d=d-dNum, dx=dx,
-#    leftmost= c(1, rep(0, nCells-1)),
-#    rightmost= c(rep(0, nCells-1), 1)
-#  ))
-#  
-#  # Generate code, compile into shared library, load library
-#  model$compile(fileFun)
-#  
-#  # Numeric solution
-#  solNum <- model$dynamics(times=times, jactype="bandint", bandup=1, banddown=1,
-#    atol=1e-9)
-#  
-#  # Function providing the analytical solution
-#  solAna <- function (x,t,mass,area,disp,velo) {
-#    mass/area/sqrt(4*pi*disp*t) * exp(-((x-velo*t)^2) / (4*disp*t))
-#  }
-#  
-#  # Graphically compare numerical and analytical solution
-#  nc <- 2
-#  nr <- ceiling(length(times) / nc)
-#  layout(matrix(1:(nc*nr), ncol=nc, byrow=TRUE))
-#  par(mar=c(4,4,1,1))
-#  for (t in times) {
-#    plot(c(0,nCells*dx), c(1e-7,inputMass/wetArea/dx), type="n", xlab="Station (m)",
-#      ylab="g/m3", log="y")
-#    # Numeric solution (stair steps of cell-average)
-#    stations <- seq(from=0, by=dx, length.out=nCells+1)
-#    concs <- solNum[solNum[,1]==t, paste0("c.",1:nCells)]
-#    lines(stations, c(concs,concs[length(concs)]), type="s", col="steelblue4")
-#    # Analytical solution (for center of cells)
-#    stations <- seq(from=dx/2, to=(nCells*dx)-dx/2, by=dx)
-#    concs <- solAna(x=stations, t=t, mass=inputMass, area=wetArea, disp=d, velo=u)
-#    stations <- stations + (inputCell*dx) - dx/2
-#    lines(stations, concs, col="red", lty=2)
-#    # Extras
-#    abline(v=(inputCell*dx) - dx/2, lty=3)
-#    legend("topright", bty="n", paste("After",t,"sec"))
-#    if (t == times[1]) legend("right",lty=1:2,
-#      col=c("steelblue4","red"),legend=c("Numeric", "Exact"),bty="n")
-#  }
-#  layout(1)
+# rm(list=ls())
+# 
+# # Adjustable settings ##########################################################
+# fileFun <- "functions.f95"
+# u <- 1                                 # advective velocity (m/s)
+# d <- 30                                # longit. dispersion coefficient (m2/s)
+# wetArea <- 50                          # wet cross-section area (m2)
+# dx <- 10                               # length of a sub-section (m)
+# nCells <- 1000                         # number of sub-sections
+# inputCell <- 100                       # index of sub-section with tracer input
+# inputMass <- 10                        # input mass (g)
+# times <- c(0,30,60,600,1800,3600)      # times (seconds)
+# # End of settings ##############################################################
+# 
+# # Load packages
+# library("deSolve")
+# library("rodeo")
+# 
+# # Make sure that vector of times starts with zero
+# times <- sort(unique(c(0, times)))
+# 
+# # Initialize rodeo object
+# rd <- function(f) {read.table(file=f,
+#   header=TRUE, sep="\t", stringsAsFactors=FALSE) }
+# model <- rodeo$new(vars=rd("vars.txt"), pars=rd("pars.txt"),
+#   funs=rd("funs.txt"), pros=rd("pros.txt"), stoi=rd("stoi.txt"),
+#   asMatrix=FALSE, dim=c(nCells))
+# 
+# # Numerical dispersion for backward finite-difference approx. of advection term
+# dNum <- u*dx/2
+# 
+# # Assign initial values and parameters
+# model$setVars(cbind(
+#   c=ifelse((1:nCells)==inputCell, inputMass/wetArea/dx, 0)
+# ))
+# model$setPars(cbind(
+#   u=u, d=d-dNum, dx=dx,
+#   leftmost= c(1, rep(0, nCells-1)),
+#   rightmost= c(rep(0, nCells-1), 1)
+# ))
+# 
+# # Generate code, compile into shared library, load library
+# model$compile(fileFun, fortran=TRUE)
+# 
+# # Numeric solution
+# solNum <- model$dynamics(times=times, jactype="bandint", bandup=1, banddown=1,
+#   atol=1e-9, fortran=TRUE)
+# 
+# # Function providing the analytical solution
+# solAna <- function (x,t,mass,area,disp,velo) {
+#   mass/area/sqrt(4*pi*disp*t) * exp(-((x-velo*t)^2) / (4*disp*t))
+# }
+# 
+# # Graphically compare numerical and analytical solution
+# nc <- 2
+# nr <- ceiling(length(times) / nc)
+# layout(matrix(1:(nc*nr), ncol=nc, byrow=TRUE))
+# par(mar=c(4,4,1,1))
+# for (t in times) {
+#   plot(c(0,nCells*dx), c(1e-7,inputMass/wetArea/dx), type="n", xlab="Station (m)",
+#     ylab="g/m3", log="y")
+#   # Numeric solution (stair steps of cell-average)
+#   stations <- seq(from=0, by=dx, length.out=nCells+1)
+#   concs <- solNum[solNum[,1]==t, paste0("c.",1:nCells)]
+#   lines(stations, c(concs,concs[length(concs)]), type="s", col="steelblue4")
+#   # Analytical solution (for center of cells)
+#   stations <- seq(from=dx/2, to=(nCells*dx)-dx/2, by=dx)
+#   concs <- solAna(x=stations, t=t, mass=inputMass, area=wetArea, disp=d, velo=u)
+#   stations <- stations + (inputCell*dx) - dx/2
+#   lines(stations, concs, col="red", lty=2)
+#   # Extras
+#   abline(v=(inputCell*dx) - dx/2, lty=3)
+#   legend("topright", bty="n", paste("After",t,"sec"))
+#   if (t == times[1]) legend("right",lty=1:2,
+#     col=c("steelblue4","red"),legend=c("Numeric", "Exact"),bty="n")
+# }
+# layout(1)
 
 ## ----ref.label='advectionDispersion', echo=FALSE, eval=TRUE-----------------------------------------------------------
 rm(list=ls())
@@ -956,11 +1049,11 @@ model$setPars(cbind(
 ))
 
 # Generate code, compile into shared library, load library
-model$compile(fileFun)              
+model$compile(fileFun, fortran=TRUE)              
 
 # Numeric solution
 solNum <- model$dynamics(times=times, jactype="bandint", bandup=1, banddown=1,
-  atol=1e-9)
+  atol=1e-9, fortran=TRUE)
 
 # Function providing the analytical solution
 solAna <- function (x,t,mass,area,disp,velo) {
@@ -1017,43 +1110,44 @@ cat(paste(text,"\n"))
 knitr::read_chunk("xecute.r")
 
 ## ----ref.label='groundwater', echo=TRUE, eval=FALSE-------------------------------------------------------------------
-#  rm(list=ls())
-#  
-#  # Adjustable settings ##########################################################
-#  fileFun <- "functions.f95"
-#  dx <- 10                             # spatial discretization (m)
-#  nx <- 100                            # number of boxes (-)
-#  times <- seq(0, 12*365, 30)          # times of interest (days)
-#  # End of settings ##############################################################
-#  
-#  # Load packages
-#  library("deSolve")
-#  library("rodeo")
-#  
-#  # Initialize model
-#  rd <- function(f) {read.table(file=f,
-#    header=TRUE, sep="\t", stringsAsFactors=FALSE)}
-#  model <- rodeo$new(vars=rd("vars.txt"), pars=rd("pars.txt"),
-#    funs=rd("funs.txt"), pros=rd("pros.txt"),
-#    stoi=rd("stoi.txt"), asMatrix=FALSE, dim=nx)
-#  
-#  # Assign initial values and parameters
-#  model$setVars(cbind( h=rep(11, nx) ))
-#  model$setPars(cbind( dx=rep(dx, nx), kf=rep(5., nx), ne=rep(0.17, nx),
-#    h0=rep(-10, nx), hBed=rep(10, nx), wBed=rep(0.5*dx, nx), kfBed=rep(5., nx),
-#    tBed=rep(0.1, nx), leaky=c(1, rep(0, nx-1)) ))
-#  
-#  # Generate code, compile into shared library, load library
-#  model$compile(fileFun)
-#  
-#  # Integrate
-#  out <- model$dynamics(times=times, jactype="bandint", bandup=1, banddown=1)
-#  
-#  # Plot results
-#  filled.contour(x=out[,"time"]/365.25, y=(1:nx)*dx-dx/2,
-#    z=out[,names(model$getVars())], xlab="Years", ylab="Distance to river (m)",
-#    color.palette=colorRampPalette(c("steelblue2","lightyellow","darkorange")),
-#    key.title= mtext(side=3, "Ground water surf. (m)", padj=-0.5))
+# rm(list=ls())
+# 
+# # Adjustable settings ##########################################################
+# fileFun <- "functions.f95"
+# dx <- 10                             # spatial discretization (m)
+# nx <- 100                            # number of boxes (-)
+# times <- seq(0, 12*365, 30)          # times of interest (days)
+# # End of settings ##############################################################
+# 
+# # Load packages
+# library("deSolve")
+# library("rodeo")
+# 
+# # Initialize model
+# rd <- function(f) {read.table(file=f,
+#   header=TRUE, sep="\t", stringsAsFactors=FALSE)}
+# model <- rodeo$new(vars=rd("vars.txt"), pars=rd("pars.txt"),
+#   funs=rd("funs.txt"), pros=rd("pros.txt"),
+#   stoi=rd("stoi.txt"), asMatrix=FALSE, dim=nx)
+# 
+# # Assign initial values and parameters
+# model$setVars(cbind( h=rep(11, nx) ))
+# model$setPars(cbind( dx=rep(dx, nx), kf=rep(5., nx), ne=rep(0.17, nx),
+#   h0=rep(-10, nx), hBed=rep(10, nx), wBed=rep(0.5*dx, nx), kfBed=rep(5., nx),
+#   tBed=rep(0.1, nx), leaky=c(1, rep(0, nx-1)) ))
+# 
+# # Generate code, compile into shared library, load library
+# model$compile(fileFun, fortran=TRUE)
+# 
+# # Integrate
+# out <- model$dynamics(times=times, jactype="bandint", bandup=1,
+#   banddown=1, fortran=TRUE)
+# 
+# # Plot results
+# filled.contour(x=out[,"time"]/365.25, y=(1:nx)*dx-dx/2,
+#   z=out[,names(model$getVars())], xlab="Years", ylab="Distance to river (m)",
+#   color.palette=colorRampPalette(c("steelblue2","lightyellow","darkorange")),
+#   key.title= mtext(side=3, "Ground water surf. (m)", padj=-0.5))
 
 ## ----ref.label='groundwater', echo=FALSE, eval=TRUE-------------------------------------------------------------------
 rm(list=ls())
@@ -1083,10 +1177,11 @@ model$setPars(cbind( dx=rep(dx, nx), kf=rep(5., nx), ne=rep(0.17, nx),
   tBed=rep(0.1, nx), leaky=c(1, rep(0, nx-1)) ))
 
 # Generate code, compile into shared library, load library
-model$compile(fileFun)              
+model$compile(fileFun, fortran=TRUE)              
 
 # Integrate
-out <- model$dynamics(times=times, jactype="bandint", bandup=1, banddown=1)
+out <- model$dynamics(times=times, jactype="bandint", bandup=1,
+  banddown=1, fortran=TRUE)
 
 # Plot results
 filled.contour(x=out[,"time"]/365.25, y=(1:nx)*dx-dx/2,
@@ -1182,7 +1277,7 @@ model <- rodeo$new(vars=rd("vars.txt"), pars=rd("pars.txt"), funs=rd("funs.txt")
   asMatrix=TRUE, dim=c(nTanks))
 
 # Generate code, compile into shared library, load library
-model$compile(sources="functions.f95")
+model$compile(sources="functions.f95", fortran=TRUE)
 
 # Assign initial values
 vars <- matrix(rep(as.numeric(model$getVarsTable()$initial), each=nTanks),
@@ -1206,43 +1301,43 @@ pars[,"ur"] <- pars[,"us"] * vars[,"TSS_w"] /               # resuspension velo.
 model$setPars(pars)
 
 ## ----ref.label='tetracycline_stoi', echo=TRUE, eval=FALSE-------------------------------------------------------------
-#  # Plot stoichiometry matrix using symbols
-#  m <- model$stoichiometry(box=1)
-#  clr <- function(x, ignoreSign=FALSE) {
-#    res <- rep("transparent", length(x))
-#    if (ignoreSign) {
-#      res[x != 0] <- "black"
-#    } else {
-#      res[x < 0] <- "lightgrey"
-#      res[x > 0] <- "white"
-#    }
-#    return(res)
-#  }
-#  sym <- function(x, ignoreSign=FALSE) {
-#    res <- rep(NA, length(x))
-#    if (ignoreSign) {
-#      res[x != 0] <- 21
-#    } else {
-#      res[x < 0] <- 25
-#      res[x > 0] <- 24
-#    }
-#    return(res)
-#  }
-#  omar <- par("mar")
-#  par(mar=c(1,6,6,1))
-#  plot(c(1,ncol(m)), c(1,nrow(m)), bty="n", type="n", xaxt="n", yaxt="n",
-#    xlab="", ylab="")
-#  abline(h=1:nrow(m), v=1:ncol(m), col="grey")
-#  for (ir in 1:nrow(m)) {
-#    ignoreSign <- grepl(pattern="^transport.*", x=rownames(m)[ir]) ||
-#      grepl(pattern="^diffusion.*", x=rownames(m)[ir])
-#    points(1:ncol(m), rep(ir,ncol(m)), pch=sym(m[ir,1:ncol(m)], ignoreSign),
-#      bg=clr(m[ir,1:ncol(m)], ignoreSign))
-#  }
-#  mtext(side=2, at=1:nrow(m), rownames(m), las=2, line=0.5, cex=0.8)
-#  mtext(side=3, at=1:ncol(m), colnames(m), las=2, line=0.5, cex=0.8)
-#  par(mar=omar)
-#  rm(m)
+# # Plot stoichiometry matrix using symbols
+# m <- model$stoichiometry(box=1)
+# clr <- function(x, ignoreSign=FALSE) {
+#   res <- rep("transparent", length(x))
+#   if (ignoreSign) {
+#     res[x != 0] <- "black"
+#   } else {
+#     res[x < 0] <- "lightgrey"
+#     res[x > 0] <- "white"
+#   }
+#   return(res)
+# }
+# sym <- function(x, ignoreSign=FALSE) {
+#   res <- rep(NA, length(x))
+#   if (ignoreSign) {
+#     res[x != 0] <- 21
+#   } else {
+#     res[x < 0] <- 25
+#     res[x > 0] <- 24
+#   }
+#   return(res)
+# }
+# omar <- par("mar")
+# par(mar=c(1,6,6,1))
+# plot(c(1,ncol(m)), c(1,nrow(m)), bty="n", type="n", xaxt="n", yaxt="n",
+#   xlab="", ylab="")
+# abline(h=1:nrow(m), v=1:ncol(m), col="grey")
+# for (ir in 1:nrow(m)) {
+#   ignoreSign <- grepl(pattern="^transport.*", x=rownames(m)[ir]) ||
+#     grepl(pattern="^diffusion.*", x=rownames(m)[ir])
+#   points(1:ncol(m), rep(ir,ncol(m)), pch=sym(m[ir,1:ncol(m)], ignoreSign),
+#     bg=clr(m[ir,1:ncol(m)], ignoreSign))
+# }
+# mtext(side=2, at=1:nrow(m), rownames(m), las=2, line=0.5, cex=0.8)
+# mtext(side=3, at=1:ncol(m), colnames(m), las=2, line=0.5, cex=0.8)
+# par(mar=omar)
+# rm(m)
 
 ## ----ref.label='tetracycline_stoi', echo=FALSE, eval=TRUE, fig.width=6, fig.height=7----------------------------------
 # Plot stoichiometry matrix using symbols
@@ -1284,28 +1379,28 @@ par(mar=omar)
 rm(m)
 
 ## ----ref.label='tetracycline_steady', echo=TRUE, eval=FALSE-----------------------------------------------------------
-#  # Estimate steady-state
-#  std <- rootSolve::steady.1D(y=model$getVars(), time=NULL, func=model$libFunc(),
-#    parms=model$getPars(), nspec=model$lenVars(), dimens=nTanks, positive=TRUE,
-#    dllname=model$libName(), nout=model$lenPros()*nTanks)
-#  if (!attr(std, which="steady", exact=TRUE))
-#    stop("Steady-state run failed.")
-#  names(std$y) <- names(model$getVars())
-#  
-#  # Plot bacterial densities
-#  stations= ((1:nTanks) * len/nTanks - len/nTanks/2) / 1000     # stations (km)
-#  domains= c(Water="_w", Sediment="_s")                         # domain suffixes
-#  layout(matrix(1:length(domains), ncol=length(domains)))
-#  for (i in 1:length(domains)) {
-#    R= match(paste0("R",domains[i],".",1:nTanks), names(std$y)) # resistant bac.
-#    S= match(paste0("S",domains[i],".",1:nTanks), names(std$y)) # susceptibles
-#    plot(x=range(stations), y=range(std$y[c(S,R)]), type="n",
-#      xlab=ifelse(i==1,"Station (km)",""), ylab=ifelse(i==1,"mg/l",""))
-#    lines(stations, std$y[R], lty=1)
-#    lines(stations, std$y[S], lty=2)
-#    if (i==1) legend("topleft", bty="n", lty=1:2, legend=c("Resistant","Suscept."))
-#    mtext(side=3, names(domains)[i])
-#  }
+# # Estimate steady-state
+# std <- rootSolve::steady.1D(y=model$getVars(), time=NULL, func=model$libFunc(),
+#   parms=model$getPars(), nspec=model$lenVars(), dimens=nTanks, positive=TRUE,
+#   dllname=model$libName(), nout=model$lenPros()*nTanks)
+# if (!attr(std, which="steady", exact=TRUE))
+#   stop("Steady-state run failed.")
+# names(std$y) <- names(model$getVars())
+# 
+# # Plot bacterial densities
+# stations= ((1:nTanks) * len/nTanks - len/nTanks/2) / 1000     # stations (km)
+# domains= c(Water="_w", Sediment="_s")                         # domain suffixes
+# layout(matrix(1:length(domains), ncol=length(domains)))
+# for (i in 1:length(domains)) {
+#   R= match(paste0("R",domains[i],".",1:nTanks), names(std$y)) # resistant bac.
+#   S= match(paste0("S",domains[i],".",1:nTanks), names(std$y)) # susceptibles
+#   plot(x=range(stations), y=range(std$y[c(S,R)]), type="n",
+#     xlab=ifelse(i==1,"Station (km)",""), ylab=ifelse(i==1,"mg/l",""))
+#   lines(stations, std$y[R], lty=1)
+#   lines(stations, std$y[S], lty=2)
+#   if (i==1) legend("topleft", bty="n", lty=1:2, legend=c("Resistant","Suscept."))
+#   mtext(side=3, names(domains)[i])
+# }
 
 ## ----ref.label='tetracycline_steady', echo=FALSE, eval=TRUE, fig.width=6, fig.height=3.5------------------------------
 # Estimate steady-state
@@ -1350,67 +1445,67 @@ filled.contour(x=stations, y=dyn[,"time"], z=t(m), xlab="Station", ylab="Days",
   main=name, cex.main=1, font.main=1)
 
 ## ----ref.label='tetracycline_sensitivity', echo=TRUE, eval=FALSE------------------------------------------------------
-#  # Define parameter values for sensitivity analysis
-#  testList <- list(
-#    A_in= c(0.002, 0.005),                              #   input of antibiotic
-#    alpha= c(0, 0.25),                                  #   cost of resistance
-#    ks= seq(0, 0.02, 0.002),                            #   loss of resistance
-#    kc= 10^seq(from=-4, to=-2, by=0.5))                 #   transfer of resistance
-#  
-#  # Set up parameter sets
-#  testSets <- expand.grid(testList)
-#  
-#  # Function to return the steady-state solution for specific parameters
-#  f <- function(set, y0) {
-#    p <- model$getPars(asArray=TRUE)
-#    p[,names(set)] <- rep(as.numeric(set), each=nTanks) # update parameters
-#    out <- rootSolve::steady.1D(y=y0, time=NULL, func=model$libFunc(),
-#      parms=p, nspec=model$lenVars(), dimens=nTanks, positive=TRUE,
-#      dllname=model$libName(), nout=model$lenPros()*nTanks)
-#    if (attr(out, which="steady", exact=TRUE)) {        # solution found?
-#      names(out$y) <- names(model$getVars())
-#      down_S_w <- out$y[paste0("S_w",".",nTanks)]       # bacteria concentrations
-#      down_R_w <- out$y[paste0("R_w",".",nTanks)]       #   at lower end of reach
-#      return(unname(down_R_w / (down_R_w + down_S_w)))  # fraction of resistant b.
-#    } else {
-#      return(NA)                                        # if solver failed
-#    }
-#  }
-#  
-#  # Use already computed steady state solution as initial guess
-#  y0 <- array(std$y, dim=c(nTanks, model$lenVars()),
-#    dimnames=list(NULL, model$namesVars()))
-#  
-#  # Apply model to all sets and store results as 4-dimensional array
-#  res <- array(apply(X=testSets, MARGIN=1, FUN=f, y0=y0),
-#    dim=lapply(testList, length), dimnames=testList)
-#  
-#  # Plot results of the analysis
-#  omar <- par("mar")
-#  par(mar=c(4,4,1.5,1))
-#  breaks <- pretty(res, 8)
-#  colors <- colorRampPalette(c("steelblue2","khaki2","brown"))(length(breaks)-1)
-#  nr <- length(testList$A_in)
-#  nc <- length(testList$alpha)
-#  layout(cbind(matrix(1:(nr*nc), nrow=nr), rep(nr*nc+1, nr)))
-#  for (alpha in testList$alpha) {
-#    for (A_in in testList$A_in) {
-#      labs <- (A_in == tail(testList$A_in, n=1)) && (alpha == testList$alpha[1])
-#      image(x=log10(as.numeric(dimnames(res)$kc)), y=as.numeric(dimnames(res)$ks),
-#        z=t(res[as.character(A_in), as.character(alpha),,]),
-#        zlim=range(res), breaks=breaks, col=colors,
-#        xlab=ifelse(labs, "log10(kc)", ""), ylab=ifelse(labs, "ks", ""))
-#      if (A_in == testList$A_in[1])
-#        mtext(side=3, paste0("alpha = ",alpha), cex=par("cex"), line=.2)
-#      if (alpha == tail(testList$alpha, n=1))
-#        mtext(side=4, paste0("A_in = ",A_in), cex=par("cex"), las=3, line=.2)
-#    }
-#  }
-#  plot.new()
-#  legend("left", bty="n", title="% resistant", fill=colors,
-#    legend=paste0(breaks[-length(breaks)]*100," - ", breaks[-1]*100))
-#  layout(1)
-#  par(mar=omar)
+# # Define parameter values for sensitivity analysis
+# testList <- list(
+#   A_in= c(0.002, 0.005),                              #   input of antibiotic
+#   alpha= c(0, 0.25),                                  #   cost of resistance
+#   ks= seq(0, 0.02, 0.002),                            #   loss of resistance
+#   kc= 10^seq(from=-4, to=-2, by=0.5))                 #   transfer of resistance
+# 
+# # Set up parameter sets
+# testSets <- expand.grid(testList)
+# 
+# # Function to return the steady-state solution for specific parameters
+# f <- function(set, y0) {
+#   p <- model$getPars(asArray=TRUE)
+#   p[,names(set)] <- rep(as.numeric(set), each=nTanks) # update parameters
+#   out <- rootSolve::steady.1D(y=y0, time=NULL, func=model$libFunc(),
+#     parms=p, nspec=model$lenVars(), dimens=nTanks, positive=TRUE,
+#     dllname=model$libName(), nout=model$lenPros()*nTanks)
+#   if (attr(out, which="steady", exact=TRUE)) {        # solution found?
+#     names(out$y) <- names(model$getVars())
+#     down_S_w <- out$y[paste0("S_w",".",nTanks)]       # bacteria concentrations
+#     down_R_w <- out$y[paste0("R_w",".",nTanks)]       #   at lower end of reach
+#     return(unname(down_R_w / (down_R_w + down_S_w)))  # fraction of resistant b.
+#   } else {
+#     return(NA)                                        # if solver failed
+#   }
+# }
+# 
+# # Use already computed steady state solution as initial guess
+# y0 <- array(std$y, dim=c(nTanks, model$lenVars()),
+#   dimnames=list(NULL, model$namesVars()))
+# 
+# # Apply model to all sets and store results as 4-dimensional array
+# res <- array(apply(X=testSets, MARGIN=1, FUN=f, y0=y0),
+#   dim=lapply(testList, length), dimnames=testList)
+# 
+# # Plot results of the analysis
+# omar <- par("mar")
+# par(mar=c(4,4,1.5,1))
+# breaks <- pretty(res, 8)
+# colors <- colorRampPalette(c("steelblue2","khaki2","brown"))(length(breaks)-1)
+# nr <- length(testList$A_in)
+# nc <- length(testList$alpha)
+# layout(cbind(matrix(1:(nr*nc), nrow=nr), rep(nr*nc+1, nr)))
+# for (alpha in testList$alpha) {
+#   for (A_in in testList$A_in) {
+#     labs <- (A_in == tail(testList$A_in, n=1)) && (alpha == testList$alpha[1])
+#     image(x=log10(as.numeric(dimnames(res)$kc)), y=as.numeric(dimnames(res)$ks),
+#       z=t(res[as.character(A_in), as.character(alpha),,]),
+#       zlim=range(res), breaks=breaks, col=colors,
+#       xlab=ifelse(labs, "log10(kc)", ""), ylab=ifelse(labs, "ks", ""))
+#     if (A_in == testList$A_in[1])
+#       mtext(side=3, paste0("alpha = ",alpha), cex=par("cex"), line=.2)
+#     if (alpha == tail(testList$alpha, n=1))
+#       mtext(side=4, paste0("A_in = ",A_in), cex=par("cex"), las=3, line=.2)
+#   }
+# }
+# plot.new()
+# legend("left", bty="n", title="% resistant", fill=colors,
+#   legend=paste0(breaks[-length(breaks)]*100," - ", breaks[-1]*100))
+# layout(1)
+# par(mar=omar)
 
 ## ----ref.label='tetracycline_sensitivity', echo=FALSE, eval=TRUE, fig.width=7, fig.height=4---------------------------
 # Define parameter values for sensitivity analysis
@@ -1534,10 +1629,10 @@ model$setVars(vars)
 model$setPars(pars)
 
 # Generate code, compile into shared library, load library
-model$compile("functions.f95")              
+model$compile("functions.f95", fortran=TRUE)              
 
 # Integrate
-out <- model$dynamics(times=times)
+out <- model$dynamics(times=times, fortran=TRUE)
 
 # Plot method for deSolve objects
 plot(out)
@@ -1618,7 +1713,7 @@ if (internal) {
     models[[obj]]$initStepper("functions.f95", method="rk5")
 } else {
   for (obj in objects) {
-    models[[obj]]$compile("functions.f95")
+    models[[obj]]$compile("functions.f95", fortran=TRUE)
   }
 }
 
@@ -1648,7 +1743,7 @@ integr <- function(obj, t0, t1, models, internal, check) {
   if (internal) {
     return(models[[obj]]$step(t0, h=t1-t0, check=check))
   } else {
-    return(models[[obj]]$dynamics(times=c(t0, t1))[2,-1])
+    return(models[[obj]]$dynamics(times=c(t0, t1), fortan=TRUE)[2,-1])
   }
 }
 
